@@ -1,7 +1,7 @@
 package com.ss.utopia.auth.controller;
 
-import com.ss.utopia.auth.dto.UpdateUserDto;
-import com.ss.utopia.auth.dto.UserDto;
+import com.ss.utopia.auth.dto.SentUserDto;
+import com.ss.utopia.auth.dto.ReceivedUserDto;
 import com.ss.utopia.auth.entity.User;
 import com.ss.utopia.auth.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,8 +23,8 @@ public class UserController {
 
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
-  public User signup(@RequestBody @Valid UserDto userDto) {
-    return userService.signup(userDto);
+  public User signup(@RequestBody @Valid ReceivedUserDto receivedUserDto) {
+    return userService.signup(receivedUserDto);
   }
 
   @DeleteMapping("/{userId}")
@@ -36,14 +36,14 @@ public class UserController {
 
   @PutMapping("/{userId}")
   @PreAuthorize("hasRole('ROLE_ADMIN')")
-  public User updateUser(@PathVariable Long userId, @RequestBody @Valid UpdateUserDto userDto) {
+  public User updateUser(@PathVariable Long userId, @RequestBody @Valid ReceivedUserDto receivedUserDto) {
     User user = userService.getUserById(userId);
-    return userService.updateUser(user, userDto);
+    return userService.updateUser(user, receivedUserDto);
   }
 
   @GetMapping
   @PreAuthorize("hasRole('ROLE_ADMIN')")
-  public Page<User> getAllUsers(@RequestParam Map<String,String> params) {
+  public Page<SentUserDto> getAllUsers(@RequestParam Map<String,String> params) {
     return userService.getAll(params);
   }
   
