@@ -24,8 +24,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ss.utopia.auth.AuthApplication;
 import com.ss.utopia.auth.dto.LoginDto;
-import com.ss.utopia.auth.dto.UpdateUserDto;
-import com.ss.utopia.auth.dto.UserDto;
+import com.ss.utopia.auth.dto.SentUserDto;
+import com.ss.utopia.auth.dto.ReceivedUserDto;
 import com.ss.utopia.auth.entity.User;
 import com.ss.utopia.auth.entity.UserRole;
 import com.ss.utopia.auth.service.UserService;
@@ -72,8 +72,8 @@ public class UserControllerIntegrationTest {
 	  private String getUserDto(String username, String password, String givenName, String familyName, String email,
 			  String phone, String role) throws JsonProcessingException {
 		    ObjectMapper objectMapper = new ObjectMapper();
-		    UserDto userDto = new UserDto( username, password, givenName, familyName, email, phone, role);
-		    return objectMapper.writeValueAsString(userDto);
+		    ReceivedUserDto receivedUserDto = new ReceivedUserDto( username, password, givenName, familyName, email, phone, role);
+		    return objectMapper.writeValueAsString(receivedUserDto);
 	  }
 	  
 	  private String buildAdminUser() throws JsonProcessingException {
@@ -93,7 +93,7 @@ public class UserControllerIntegrationTest {
 	  private String getUpdateUserDto(String username, String password, String givenName, String familyName, String email,
 			  String phone) throws JsonProcessingException {
 		    ObjectMapper objectMapper = new ObjectMapper();
-		    UpdateUserDto userDto = new UpdateUserDto( username, password, givenName, familyName, email, phone);
+		    ReceivedUserDto userDto = new ReceivedUserDto( username, password, givenName, familyName, email, phone);
 		    return objectMapper.writeValueAsString(userDto);
 		  }
 	  

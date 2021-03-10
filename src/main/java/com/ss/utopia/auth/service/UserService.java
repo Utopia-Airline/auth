@@ -1,8 +1,8 @@
 package com.ss.utopia.auth.service;
 
 import com.ss.utopia.auth.dao.UserDao;
-import com.ss.utopia.auth.dto.UpdateUserDto;
-import com.ss.utopia.auth.dto.UserDto;
+import com.ss.utopia.auth.dto.SentUserDto;
+import com.ss.utopia.auth.dto.ReceivedUserDto;
 import com.ss.utopia.auth.entity.User;
 
 import org.slf4j.Logger;
@@ -70,13 +70,13 @@ public class UserService implements UserDetailsService {
   }
 
   /**
-   * @param userDto
+   * @param receivedUserDto
    * @return
    */
-  public User signup(UserDto userDto) {
+  public User signup(ReceivedUserDto receivedUserDto) {
     LOGGER.info("New user attempting to sign up");
-    userDto.setPassword(passwordEncoder.encode(userDto.getPassword()));
-    User user = new User(userDto);
+    receivedUserDto.setPassword(passwordEncoder.encode(receivedUserDto.getPassword()));
+    User user = new User(receivedUserDto);
     
     if(user.getRole().getId().equals(null))
     	throw new HttpServerErrorException(HttpStatus.BAD_REQUEST, "Unauthorized Role");
@@ -90,9 +90,9 @@ public class UserService implements UserDetailsService {
    * @param user
    * @return
    */
-  public User updateUser(User user, UpdateUserDto userDto) {
+  public User updateUser(User user, ReceivedUserDto receivedUserDto) {
     LOGGER.info("User attempting to update info");
-    return submitUser(updateUserInfo(user, userDto));
+    return submitUser(updateUserInfo(user, receivedUserDto));
 
   }
 
@@ -115,7 +115,7 @@ public class UserService implements UserDetailsService {
    * @param 
    * @return Page<User>
    */
-  public Page<User> getAll(Map<String,String> params) {
+  public Page<SentUserDto> getAll(Map<String,String> params) {
 	  try {
 		  String username = params.get("username");
 		  String email = params.get("email");
@@ -135,17 +135,18 @@ public class UserService implements UserDetailsService {
 		  if(params.get("offset") == null || params.get("limit") == null) {
 			  if(params.get("role") != null) {
 				  Page<User> users = new PageImpl<>(userDao.findAll(username, email, Integer.parseInt(params.get("role")), sort));
-				  return users;
+				  return users.map(SentUserDto::convertToSentUserDto);
 			  }
-			  return new PageImpl<>(userDao.findAll(username, email, sort));
+			  Page<User> users = new PageImpl<>(userDao.findAll(username, email, sort));
+			  return users.map(SentUserDto::convertToSentUserDto);
 		  }
 		  
 //		  For paginated list of users
 		  Pageable paging = PageRequest.of(Integer.parseInt(params.get("offset")), Integer.parseInt(params.get("limit")), sort);
 		  if(params.get("role") != null) {
-			  return userDao.findAll(username, email, Integer.parseInt(params.get("role")), paging);
+			  return userDao.findAll(username, email, Integer.parseInt(params.get("role")), paging).map(SentUserDto::convertToSentUserDto);
 		  }
-		  return userDao.findAll(username, email, paging);
+		  return userDao.findAll(username, email, paging).map(SentUserDto::convertToSentUserDto);
 	  }
 	  catch(Exception e) {
 			LOGGER.error(e.getMessage());
@@ -246,19 +247,19 @@ public class UserService implements UserDetailsService {
   
   
 //  TODO: Research Strings class to simplify strings
-  private User updateUserInfo(User user, UpdateUserDto userDto) {
-	  if(userDto.getUsername() != null && userDto.getUsername() != "")
-	      user.setUsername(userDto.getUsername());
-	  if(userDto.getPassword() != null && userDto.getPassword() != "")
-	      user.setPassword(passwordEncoder.encode(userDto.getPassword()));
-	  if(userDto.getGivenName() != null && userDto.getGivenName() != "")
-	      user.setGivenName(userDto.getGivenName());
-	  if(userDto.getFamilyName() != null && userDto.getFamilyName() != "")
-		  user.setFamilyName(userDto.getFamilyName());
-	  if(userDto.getEmail() != null && userDto.getEmail() != "")
-		  user.setEmail(userDto.getEmail());
-	  if(userDto.getPhone() != null && userDto.getPhone() != "")
-		  user.setPhone(userDto.getPhone());
+  private User updateUserInfo(User user, ReceivedUserDto receivedUserDto) {
+	  if(receivedUserDto.getUsername() != null && receivedUserDto.getUsername() != "")
+	      user.setUsername(receivedUserDto.getUsername());
+	  if(receivedUserDto.getPassword() != null && receivedUserDto.getPassword() != "")
+	      user.setPassword(passwordEncoder.encode(receivedUserDto.getPassword()));
+	  if(receivedUserDto.getGivenName() != null && receivedUserDto.getGivenName() != "")
+	      user.setGivenName(receivedUserDto.getGivenName());
+	  if(receivedUserDto.getFamilyName() != null && receivedUserDto.getFamilyName() != "")
+		  user.setFamilyName(receivedUserDto.getFamilyName());
+	  if(receivedUserDto.getEmail() != null && receivedUserDto.getEmail() != "")
+		  user.setEmail(receivedUserDto.getEmail());
+	  if(receivedUserDto.getPhone() != null && receivedUserDto.getPhone() != "")
+		  user.setPhone(receivedUserDto.getPhone());
 	  return user;
   }
   

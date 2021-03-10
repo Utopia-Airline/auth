@@ -1,10 +1,13 @@
 package com.ss.utopia.auth.dto;
 
-public class UpdateUserDto {
+import com.ss.utopia.auth.entity.User;
+import com.ss.utopia.auth.entity.UserRole;
+
+public class SentUserDto {
+	
+	private Long id;
 
 	private String username;
-
-	private String password;
 
 	private String givenName;
 
@@ -14,22 +17,35 @@ public class UpdateUserDto {
 
 	private String phone;
 	
-	private String role;
+	private UserRole role;
 	
-	public UpdateUserDto(String username, String password, String givenName, String familyName, String email, String phone) {
+	public SentUserDto(Long id, String username, String givenName, String familyName, String email, String phone, UserRole role) {
+		this.id = id;
 		this.username = username;
-		this.password = password;
 		this.givenName = givenName;
 		this.familyName = familyName;
 		this.email = email;
 		this.phone = phone;
+		this.role = role;
 	}
 
-	public String getRole() {
+	static public SentUserDto convertToSentUserDto(User user) {
+		return new SentUserDto(user.getId(), user.getUsername(), user.getGivenName(), user.getFamilyName(), user.getEmail(), user.getPhone(), user.getRole());
+	}
+	
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public UserRole getRole() {
 		return role;
 	}
 
-	public void setRole(String role) {
+	public void setRole(UserRole role) {
 		this.role = role;
 	}
 
@@ -39,14 +55,6 @@ public class UpdateUserDto {
 
 	public void setUsername(String username) {
 		this.username = username;
-	}
-
-	public String getPassword() {
-		return password;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
 	}
 
 	public String getGivenName() {

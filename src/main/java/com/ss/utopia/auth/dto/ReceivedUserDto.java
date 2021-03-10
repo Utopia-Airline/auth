@@ -3,41 +3,37 @@
  */
 package com.ss.utopia.auth.dto;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.NotNull;
 
 /**
  * @author Samnj
  *
  */
-public class UserDto {
+public class ReceivedUserDto {
 
-	@NotBlank
-	@Size(min = 3)
+	@NotNull
 	private String username;
 	
-	@NotBlank
-	@Size(min = 6)
+	@NotNull
 	private String password;
 	
-	@NotBlank
-	@Size(min = 2)
+	@NotNull
 	private String givenName;
 	
-	@NotBlank
-	@Size(min = 2)
+	@NotNull
 	private String familyName;
 	
-	@NotBlank
+	@NotNull
 	private String email;
 	
-	@NotBlank
-	@Size(min = 10)
+	@NotNull
 	private String phone;
 	
 	private String role;
 	
-	public UserDto(String username, String password, String givenName, String familyName, String email, String phone, String role) {
+	public ReceivedUserDto() {}
+	
+	public ReceivedUserDto(String username, String password, String givenName, String familyName, String email, String phone, String role) {
 		this.username = username;
 		this.password = password;
 		this.givenName = givenName;
@@ -45,6 +41,15 @@ public class UserDto {
 		this.email = email;
 		this.phone = phone;
 		this.role = role;
+	}
+	
+	public ReceivedUserDto(String username, String password, String givenName, String familyName, String email, String phone) {
+		this.username = username;
+		this.password = password;
+		this.givenName = givenName;
+		this.familyName = familyName;
+		this.email = email;
+		this.phone = phone;
 	}
 
 	public String getRole() {
