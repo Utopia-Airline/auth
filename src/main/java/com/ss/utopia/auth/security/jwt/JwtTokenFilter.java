@@ -4,7 +4,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
+
 import static org.springframework.security.core.userdetails.User.withUsername;
+
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 import org.springframework.stereotype.Component;
@@ -36,28 +38,32 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-      throws ServletException, IOException {
+    throws ServletException, IOException {
     LOGGER.info("Process request to check for a JSON Web Token");
     final Cookie[] cookies = request.getCookies();
-    if (cookies != null) {
-      Arrays.stream(cookies)
+    try {
+      if (cookies != null) {
+        Arrays.stream(cookies)
           // get session cookie
           .filter((cookie) -> /* cookie.isHttpOnly() && */ cookie.getPath() == null
-              && cookie.getName().matches("^session$"))
+            && cookie.getName().matches("^session$"))
           .findAny().ifPresent((sessionCookie) ->
           // parse token
           this.sessionCookieProvider.parseAuthJwt(sessionCookie).ifPresent(token ->
-          // validate token
-          this.jwtProvider.validateToken(token).ifPresent((claims) ->
-          // get user by id
-          this.userDao.findById(this.jwtProvider.getUserId(claims)).ifPresent((user) -> {
-            // create user details from user
-            final UserDetails userDetails = withUsername(user.getUsername()).password(user.getPassword())
-                .authorities(user.getRole().getAuthority()).accountExpired(false).accountLocked(false)
-                .credentialsExpired(false).disabled(false).build();
-            SecurityContextHolder.getContext().setAuthentication(
-                new PreAuthenticatedAuthenticationToken(userDetails, "", userDetails.getAuthorities()));
-          }))));
+            // validate token
+            this.jwtProvider.validateToken(token).ifPresent((claims) ->
+              // get user by id
+              this.userDao.findById(this.jwtProvider.getUserId(claims)).ifPresent((user) -> {
+                // create user details from user
+                final UserDetails userDetails = withUsername(user.getUsername()).password(user.getPassword())
+                  .authorities(user.getRole().getAuthority()).accountExpired(false).accountLocked(false)
+                  .credentialsExpired(false).disabled(false).build();
+                SecurityContextHolder.getContext().setAuthentication(
+                  new PreAuthenticatedAuthenticationToken(userDetails, "", userDetails.getAuthorities()));
+              }))));
+      }
+    } catch (Exception e) {
+      LOGGER.warn("Not able to verify token");
     }
     filterChain.doFilter(request, response);
   }
