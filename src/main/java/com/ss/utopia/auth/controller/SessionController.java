@@ -6,11 +6,13 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpServerErrorException;
 import com.ss.utopia.auth.dto.LoginDto;
+import com.ss.utopia.auth.dto.ReceivedUserDto;
 import com.ss.utopia.auth.entity.User;
 import com.ss.utopia.auth.security.SessionCookieProvider;
 import com.ss.utopia.auth.service.UserService;
@@ -101,5 +103,11 @@ public class SessionController {
     final Cookie sessionCookie = userService.removeCookie()
       .orElseThrow(() -> new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR, "Session cookie invalidation failed"));
     response.addCookie(sessionCookie);
+  }
+  
+  @PutMapping
+  public User updateUser(@AuthenticationPrincipal UserDetails currentUser, @RequestBody @Valid ReceivedUserDto receivedUserDto) {
+	  User user = userService.getUserByUsername(currentUser.getUsername());
+	  return userService.updateUser(user, receivedUserDto);
   }
 }
