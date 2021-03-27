@@ -33,7 +33,7 @@ public class UserRole implements GrantedAuthority {
 	  	case "ADMIN": 
 	  		this.id = 1L;
 	  		break;
-	  	case "Customer":
+	  	case "CUSTOMER":
 	  		this.id = 2L;
 	  		break;
 	  	case "AGENT":
